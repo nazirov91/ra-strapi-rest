@@ -122,3 +122,39 @@ const App = () => (
 
 export default App;
 ```
+
+# AuthProvider not working?
+Strapi User-permission plugin expects you to send username and password in the following format
+```js
+{
+...
+    identifier: 'your_username',
+    password: 'password'
+...
+}
+```
+So in your front end form, the name for the username input should be **identifier**
+
+However, an easier fix is to modify the Auth.js file
+To do that, in your project folder, go to **plugins/user-permissions/controllers/Auth.js**
+Then add the following line:
+```js
+params.identifier = params.identifier ? params.identifier : params.username;
+```
+above this **if** statement
+```js
+if (!params.identifier) {
+    return ctx.badRequest(null, ctx.request.admin ? [{ messages: [{ id: 'Auth.form.error.email.provide' }] }] : 'Please provide your username or your e-mail.');
+}
+```
+
+So it should look like this:
+```js
+...
+// The identifier is required.
+params.identifier = params.identifier ? params.identifier : params.username;
+if (!params.identifier) {
+return ctx.badRequest(null, ctx.request.admin ? [{ messages: [{ id: 'Auth.form.error.email.provide' }] }] : 'Please provide your username or your e-mail.');
+}
+...
+```
