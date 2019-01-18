@@ -50,7 +50,7 @@ find: async (ctx) => {
 ```
 
 # Usage
-Save the file as ra-strapi-rest.js and import it in your react-admin project
+Save the **index.js** file as ra-strapi-rest.js and import it in your react-admin project
 ```js
 import React from 'react';
 import { fetchUtils, Admin, Resource } from 'react-admin';
