@@ -1,8 +1,15 @@
 # Simple REST Data Provider for React Admin - Strapi
 [React Admin](https://marmelab.com/react-admin/) data provider for Strapi.js.
 
+# Usage
+Save the **index.js** file as ra-strapi-rest.js and import it in your react-admin project. No need to npm install another dependency :)
+```js
+import React from 'react';
+import { fetchUtils, Admin, Resource } from 'react-admin';
+import simpleRestProvider from './ra-strapi-rest';
+```
 
-# Strapi Content-Range Header Setup
+# IMPORTANT! Strapi Content-Range Header Setup
 1. Make sure CORS is enabled in Strapi project
 2. Add Content-Range to expose headers object
 *<your_project>/config/environments/development/security.js*
@@ -48,15 +55,6 @@ find: async (ctx) => {
 },
 ...
 ```
-
-# Usage
-Save the **index.js** file as ra-strapi-rest.js and import it in your react-admin project
-```js
-import React from 'react';
-import { fetchUtils, Admin, Resource } from 'react-admin';
-import simpleRestProvider from './ra-strapi-rest';
-```
-
 # Example
 
 ```js
