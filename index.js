@@ -90,9 +90,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         const keys = Object.keys(f);
         for(let i = 0; i < keys.length; i++){
             //react-admin uses q filter in several components and strapi use _q
-            if (keys[i] === "q") {
-                if (f[keys[i]] !== '')
-                    filter += "_q=" + f[keys[i]] + (keys[i + 1] ? "&" : "")
+            if (keys[i] === "q" && f[keys[i]] !== '') {
+                filter += "_q=" + f[keys[i]] + (keys[i + 1] ? "&" : "")
             } else {
                 filter += keys[i] + "=" + f[keys[i]] + (keys[i + 1] ? "&" : "");
             }
