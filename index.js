@@ -89,11 +89,13 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         let filter = "";
         const keys = Object.keys(f);
         for(let i = 0; i < keys.length; i++){
-            if (keys[i] === "q") {//react-admin uses q filter in several components and strapi use _q
+            //react-admin uses q filter in several components and strapi use _q
+            if (keys[i] === "q") {
                 if (f[keys[i]] !== '')
                     filter += "_q=" + f[keys[i]] + (keys[i + 1] ? "&" : "")
-            } else
+            } else {
                 filter += keys[i] + "=" + f[keys[i]] + (keys[i + 1] ? "&" : "");
+            }
         }
         if(params.id && params.target && params.target.indexOf('_id') !== -1){
             const target = params.target.substring(0, params.target.length - 3);
