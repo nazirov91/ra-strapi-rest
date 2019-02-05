@@ -1,4 +1,3 @@
-import { stringify } from 'query-string';
 import {
     fetchUtils,
     GET_LIST,
