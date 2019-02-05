@@ -44,13 +44,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             case GET_ONE:
                 url = `${apiUrl}/${resource}/${params.id}`;
                 break;
-            case GET_MANY: {
-                const query = {
-                    filter: JSON.stringify({ id: params.ids }),
-                };
-                url = `${apiUrl}/${resource}?${stringify(query)}`;
-                break;
-            }
             case GET_MANY_REFERENCE: {
                 const query = adjustQueryForStrapi(params);
                 url = `${apiUrl}/${resource}?${query}`;
@@ -97,7 +90,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         let filter = "";
         const keys = Object.keys(f);
         for(let i = 0; i < keys.length; i++){
-          filter += keys[i] + "=" + f[keys[i]] + (keys[i+1] ? "&" : "");
+            if (keys[i] === "q") {//react-admin uses q filter in several components and strapi use _q
+                if (f[keys[i]] !== '')
+                    filter += "_q=" + f[keys[i]] + (keys[i + 1] ? "&" : "")
+            } else
+                filter += keys[i] + "=" + f[keys[i]] + (keys[i + 1] ? "&" : "");
         }
         if(params.id && params.target && params.target.indexOf('_id') !== -1){
             const target = params.target.substring(0, params.target.length - 3);
@@ -107,7 +104,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         // Handle PAGINATION
         const { page, perPage } = params.pagination;
         const start = (page - 1) * perPage;
-        const limit = page * perPage - 1;
+        const limit = perPage;//for strapi the _limit params indicate the amount of elements to return in the response
         const range = "_start=" + start + "&_limit=" + limit;
 
         return sort + "&" + range + "&" + filter; 
@@ -174,6 +171,18 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 params.ids.map(id =>
                     httpClient(`${apiUrl}/${resource}/${id}`, {
                         method: 'DELETE',
+                    })
+                )
+            ).then(responses => ({
+                data: responses.map(response => response.json),
+            }));
+        }
+        //strapi doesn't handle filters in GET route
+        if (type === GET_MANY) {
+            return Promise.all(
+                params.ids.map(id =>
+                    httpClient(`${apiUrl}/${resource}/${id}`, {
+                        method: 'GET',
                     })
                 )
             ).then(responses => ({
