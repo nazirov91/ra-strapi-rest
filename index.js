@@ -71,10 +71,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     const adjustQueryForStrapi = (params) => {
 
         /*
-        params = { 
-            pagination: { page: {int} , perPage: {int} }, 
-            sort: { field: {string}, order: {string} }, 
-            filter: {Object}, 
+        params = {
+            pagination: { page: {int} , perPage: {int} },
+            sort: { field: {string}, order: {string} },
+            filter: {Object},
             target: {string}, (REFERENCE ONLY)
             id: {mixed} (REFERENCE ONLY)
         }
@@ -107,30 +107,35 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         const limit = perPage;//for strapi the _limit params indicate the amount of elements to return in the response
         const range = "_start=" + start + "&_limit=" + limit;
 
-        return sort + "&" + range + "&" + filter; 
-        
+        return sort + "&" + range + "&" + filter;
+
     }
 
 	const addForeignKeyToResult = (json) => {
         let foreignKey = []
         Object.keys(json).forEach(key => {
             let value = json[key];
-            const indexName = `${key}_ids`
-
+            const indexName = `${key}`
             if(typeof value === 'object'){
+                // clone array with new key name
+                // can use it in Show View <ArrayField source="offices_info">
+                let oldIndexName = indexName + '_info'
+                json[oldIndexName] = value
+
                 foreignKey = []
                 if (json[indexName] === 'undefined' || json[indexName] !== 'array'){
                   json[indexName] = []
                 }
-                value.map(item=>{
+                value.map(item => {
                   foreignKey.push(item.id)
                 })
                 json[indexName] = foreignKey
             }
         })
+
         return json
     }
-	
+
     /**
      * @param {Object} response HTTP response from fetch()
      * @param {String} type One of the constants appearing at the top if this file, e.g. 'UPDATE'
