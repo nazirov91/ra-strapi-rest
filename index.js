@@ -111,6 +111,26 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         
     }
 
+	const addForeignKeyToResult = (json) => {
+        let foreignKey = []
+        Object.keys(json).forEach(key => {
+            let value = json[key];
+            const indexName = `${key}_ids`
+
+            if(typeof value === 'object'){
+                foreignKey = []
+                if (json[indexName] === 'undefined' || json[indexName] !== 'array'){
+                  json[indexName] = []
+                }
+                value.map(item=>{
+                  foreignKey.push(item.id)
+                })
+                json[indexName] = foreignKey
+            }
+        })
+        return json
+    }
+	
     /**
      * @param {Object} response HTTP response from fetch()
      * @param {String} type One of the constants appearing at the top if this file, e.g. 'UPDATE'
@@ -119,7 +139,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
      * @returns {Object} Data response
      */
     const convertHTTPResponse = (response, type, resource, params) => {
-        const { headers, json } = response;
+        const { headers } = response;
+		let { json } = response;
         switch (type) {
             case GET_LIST:
             case GET_MANY_REFERENCE:
@@ -141,6 +162,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             case CREATE:
                 return { data: { ...params.data, id: json.id } };
             default:
+				json = addForeignKeyToResult(json)
                 return { data: json };
         }
     };
