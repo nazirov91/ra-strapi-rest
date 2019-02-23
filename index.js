@@ -35,22 +35,21 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         let url = '';
         const options = {};
         switch (type) {
-            case GET_LIST: {
+            case GET_LIST:
                 const query = adjustQueryForStrapi(params);
                 url = `${apiUrl}/${resource}?${query}`;
                 break;
-            }
             case GET_ONE:
                 url = `${apiUrl}/${resource}/${params.id}`;
                 break;
-            case GET_MANY_REFERENCE: {
+            case GET_MANY_REFERENCE:
                 const query = adjustQueryForStrapi(params);
                 url = `${apiUrl}/${resource}?${query}`;
                 break;
-            }
             case UPDATE:
                 url = `${apiUrl}/${resource}/${params.id}`;
                 options.method = 'PUT';
+                const {created_at, updated_at, createdAt, updatedAt, ...data} = params.data;
                 options.body = JSON.stringify(params.data);
                 break;
             case CREATE:
@@ -155,12 +154,13 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         // simple-rest doesn't handle filters on UPDATE route, so we fallback to calling UPDATE n times instead
         if (type === UPDATE_MANY) {
             return Promise.all(
-                params.ids.map(id =>
-                    httpClient(`${apiUrl}/${resource}/${id}`, {
+                params.ids.map(id => {
+                    const {created_at, updated_at, createdAt, updatedAt, ...data} = params.data;
+                    return httpClient(`${apiUrl}/${resource}/${id}`, {
                         method: 'PUT',
-                        body: JSON.stringify(params.data),
+                        body: JSON.stringify(data),
                     })
-                )
+                })
             ).then(responses => ({
                 data: responses.map(response => response.json),
             }));
