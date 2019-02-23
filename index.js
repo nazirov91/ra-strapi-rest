@@ -36,22 +36,20 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         const options = {};
         switch (type) {
             case GET_LIST:
-                const query = adjustQueryForStrapi(params);
-                url = `${apiUrl}/${resource}?${query}`;
+                url = `${apiUrl}/${resource}?${adjustQueryForStrapi(params)}`;
                 break;
             case GET_ONE:
                 url = `${apiUrl}/${resource}/${params.id}`;
                 break;
             case GET_MANY_REFERENCE:
-                const query = adjustQueryForStrapi(params);
-                url = `${apiUrl}/${resource}?${query}`;
+                url = `${apiUrl}/${resource}?${adjustQueryForStrapi(params)}`;
                 break;
             case UPDATE:
                 url = `${apiUrl}/${resource}/${params.id}`;
                 options.method = 'PUT';
                 // Omit created_at/updated_at(RDS) and createdAt/updatedAt(Mongo) in request body
                 const {created_at, updated_at, createdAt, updatedAt, ...data} = params.data;
-                options.body = JSON.stringify(params.data);
+                options.body = JSON.stringify(data);
                 break;
             case CREATE:
                 url = `${apiUrl}/${resource}`;
