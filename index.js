@@ -49,6 +49,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             case UPDATE:
                 url = `${apiUrl}/${resource}/${params.id}`;
                 options.method = 'PUT';
+                // Omit created_at/updated_at(RDS) and createdAt/updatedAt(Mongo) in request body
                 const {created_at, updated_at, createdAt, updatedAt, ...data} = params.data;
                 options.body = JSON.stringify(params.data);
                 break;
@@ -129,13 +130,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 }
                 return {
                     data: json,
-                    total: parseInt(
-                        headers
-                            .get('content-range')
-                            .split('/')
-                            .pop(),
-                        10
-                    ),
+                    total: parseInt(headers.get('content-range').split('/').pop(), 10)
                 };
             case CREATE:
                 return { data: { ...params.data, id: json.id } };
@@ -155,6 +150,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         if (type === UPDATE_MANY) {
             return Promise.all(
                 params.ids.map(id => {
+                    // Omit created_at/updated_at(RDS) and createdAt/updatedAt(Mongo) in request body
                     const {created_at, updated_at, createdAt, updatedAt, ...data} = params.data;
                     return httpClient(`${apiUrl}/${resource}/${id}`, {
                         method: 'PUT',
