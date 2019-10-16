@@ -36,13 +36,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         const options = {};
         switch (type) {
             case GET_LIST:
+            case GET_MANY_REFERENCE:
                 url = `${apiUrl}/${resource}?${adjustQueryForStrapi(params)}`;
                 break;
             case GET_ONE:
                 url = `${apiUrl}/${resource}/${params.id}`;
-                break;
-            case GET_MANY_REFERENCE:
-                url = `${apiUrl}/${resource}?${adjustQueryForStrapi(params)}`;
                 break;
             case UPDATE:
                 url = `${apiUrl}/${resource}/${params.id}`;
@@ -106,7 +104,6 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         const range = "_start=" + start + "&_limit=" + limit;
 
         return sort + "&" + range + "&" + filter; 
-        
     }
 
     /**
