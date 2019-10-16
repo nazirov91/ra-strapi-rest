@@ -37,7 +37,7 @@ find: async (ctx) => {
   if (ctx.query._q) {
     return strapi.services.<Model_Name>.search(ctx.query);
   } else {
-    return strapi.services.<Model_Name>.fetchAll(ctx.query);
+    return strapi.services.<Model_Name>.find(ctx.query);
   }
 },
 ...
@@ -50,7 +50,7 @@ find: async (ctx) => {
   if (ctx.query._q) {
     return strapi.services.post.search(ctx.query);
   } else {
-    return strapi.services.post.fetchAll(ctx.query);
+    return strapi.services.post.find(ctx.query);
   }
 },
 ...
