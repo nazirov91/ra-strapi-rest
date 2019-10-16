@@ -33,7 +33,7 @@ import simpleRestProvider from './ra-strapi-rest';
 ```js
 ...
 find: async (ctx) => {
-  ctx.set('Content-Range', await <Model_Name>.count());
+  ctx.set('Content-Range', await strapi.services.<Model_Name>.count());
   if (ctx.query._q) {
     return strapi.services.<Model_Name>.search(ctx.query);
   } else {
@@ -46,7 +46,7 @@ Example:
 ```js
 ...
 find: async (ctx) => {
-  ctx.set('Content-Range', await Post.count());
+  ctx.set('Content-Range', await strapi.services.Post.count());
   if (ctx.query._q) {
     return strapi.services.post.search(ctx.query);
   } else {
