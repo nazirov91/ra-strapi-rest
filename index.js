@@ -10,6 +10,7 @@ import {
     DELETE,
     DELETE_MANY,
 } from 'react-admin';
+import FormData from 'form-data';
 
 /**
  * Maps react-admin queries to a simple REST API
@@ -37,9 +38,24 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         switch (type) {
             case GET_LIST:
             case GET_MANY_REFERENCE:
-                url = `${apiUrl}/${resource}?${adjustQueryForStrapi(params)}`;
+                switch (resource){
+                    case 'upload':
+                        url = `${apiUrl}/${resource}/files?${adjustQueryForStrapi(params)}`;
+                        break;
+                    default:
+                        url = `${apiUrl}/${resource}?${adjustQueryForStrapi(params)}`;
+                        break;
+                }
                 break;
             case GET_ONE:
+                switch (resource){
+                    case 'upload':
+                        url = `${apiUrl}/${resource}/files/${params.id}`;
+                        break;
+                    default:
+                        url = `${apiUrl}/${resource}/${params.id}`;
+                        break;
+                }
                 url = `${apiUrl}/${resource}/${params.id}`;
                 break;
             case UPDATE:
@@ -55,6 +71,14 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
                 options.body = JSON.stringify(params.data);
                 break;
             case DELETE:
+                switch (resource){
+                    case 'upload':
+                        url = `${apiUrl}/${resource}/files/${params.id}`;
+                        break;
+                    default:
+                        url = `${apiUrl}/${resource}/${params.id}`;
+                        break;
+                }
                 url = `${apiUrl}/${resource}/${params.id}`;
                 options.method = 'DELETE';
                 break;
@@ -136,6 +160,12 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         }
     };
 
+    const convertFile = file =>
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            resolve(file.rawFile)
+    });
+
     /**
      * @param {string} type Request type, e.g GET_LIST
      * @param {string} resource Resource name, e.g. "posts"
@@ -161,10 +191,19 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
         // simple-rest doesn't handle filters on DELETE route, so we fallback to calling DELETE n times instead
         if (type === DELETE_MANY) {
             return Promise.all(
-                params.ids.map(id =>
-                    httpClient(`${apiUrl}/${resource}/${id}`, {
+                params.ids.map(id =>{
+                    switch (resource){
+                        case 'upload':
+                            url = `${apiUrl}/${resource}/files/${id}`;
+                            break;
+                        default:
+                            url = `${apiUrl}/${resource}/${id}`;
+                            break;
+                    }
+                    return httpClient(url, {
                         method: 'DELETE',
                     })
+                }
                 )
             ).then(responses => ({
                 data: responses.map(response => response.json),
@@ -188,8 +227,37 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             resource,
             params
         );
-        return httpClient(url, options).then(response =>
-            convertHTTPResponse(response, type, resource, params)
-        );
+
+        // for file uploading
+        if (type === CREATE){
+            if  (!(
+                    (resource === 'upload' && params.data.file)
+                )) {
+                // fallback to the default implementation
+                return httpClient(url, options).then(response =>
+                    convertHTTPResponse(response, type, resource, params)
+                );
+            }
+
+            switch (resource){
+                case 'upload':
+                    return convertFile(params.data.file)
+                    .then(transformed => {
+                        var form_data = new FormData();
+                        form_data.append('files', transformed)
+                        return httpClient(url, {
+                            method: "POST",
+                            body: form_data,
+                        }).then(response =>
+                            convertHTTPResponse(response, type, resource, params)
+                        );
+                    })
+                    .catch(err => console.log(err));
+            }
+        } else {
+            return httpClient(url, options).then(response =>
+                convertHTTPResponse(response, type, resource, params)
+            );
+        }
     };
 };
