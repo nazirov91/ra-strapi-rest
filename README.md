@@ -15,7 +15,7 @@ apiUrl='/src/config.js'
 ```js
 import React from 'react';
 import { fetchUtils, Admin, Resource } from 'react-admin';
-import { strapiProviderStorage } from 'ra-strapi-rest';
+import { ProviderStorage } from 'ra-strapi-rest';
 ```
 
 # IMPORTANT! Strapi Content-Range Header Setup
@@ -112,11 +112,11 @@ The content-range header is required only for the `find` method
 ```js
 import React from 'react';
 import { Admin, Resource } from 'react-admin';
-import { strapiProviderStorage } from 'ra-strapi-rest';
+import { ProviderStorage } from 'ra-strapi-rest';
 
 import { PostList } from './posts';
 
-const dataProvider = strapiProviderStorage('http://localhost:1337');
+const dataProvider = ProviderStorage('http://localhost:1337');
 
 const App = () => (
     <Admin dataProvider={dataProvider}>
@@ -148,14 +148,14 @@ export const PostList = (props) => (
 ```js
 import React from 'react';
 import { fetchUtils, Admin, Resource } from 'react-admin';
-import { strapiProviderStorage , authProvider, httpClient } from 'ra-strapi-rest';
+import { ProviderStorage , authProvider, httpClient } from 'ra-strapi-rest';
 
 
 import { PostList } from './posts';
 
 
 
-const dataProvider = strapiProviderStorage('http://localhost:1337', httpClient);
+const dataProvider = ProviderStorage('http://localhost:1337', httpClient);
 
 const App = () => (
     <Admin authProvider={authProvider} dataProvider={dataProvider}>

@@ -10,7 +10,7 @@ import {
     DELETE,
     DELETE_MANY,
 } from 'react-admin';
-
+const apiUrl = process.env.apiUrl || '/src/config.js';
 /**
  * Maps react-admin queries to a simple REST API
  *
@@ -24,7 +24,7 @@ import {
  * CREATE       => POST http://my.api.url/posts
  * DELETE       => DELETE http://my.api.url/posts/123
  */
-export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
+export default (httpClient = fetchUtils.fetchJson) => {
     /**
      * @param {String} type One of the constants appearing at the top if this file, e.g. 'UPDATE'
      * @param {String} resource Name of the resource to fetch, e.g. 'posts'
