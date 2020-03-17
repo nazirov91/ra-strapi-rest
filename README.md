@@ -1,12 +1,21 @@
 # Simple REST Data Provider for React Admin - Strapi
 [React Admin](https://marmelab.com/react-admin/) data provider for Strapi.js.
 
+# Istall
+```
+yarn add  devalexandre/ra-strapi-rest 
+```
 # Usage
-Save the **index.js** file as ra-strapi-rest.js and import it in your react-admin project. No need to npm install another dependency :)
+create .env for apiUrl file
+
+```
+apiUrl='/src/config.js'
+```
+
 ```js
 import React from 'react';
 import { fetchUtils, Admin, Resource } from 'react-admin';
-import simpleRestProvider from './ra-strapi-rest';
+import { strapiProviderStorage } from 'ra-strapi-rest';
 ```
 
 # IMPORTANT! Strapi Content-Range Header Setup
@@ -103,11 +112,11 @@ The content-range header is required only for the `find` method
 ```js
 import React from 'react';
 import { Admin, Resource } from 'react-admin';
-import simpleRestProvider from './ra-strapi-rest';
+import { strapiProviderStorage } from 'ra-strapi-rest';
 
 import { PostList } from './posts';
 
-const dataProvider = simpleRestProvider('http://localhost:1337');
+const dataProvider = strapiProviderStorage('http://localhost:1337');
 
 const App = () => (
     <Admin dataProvider={dataProvider}>
@@ -139,21 +148,14 @@ export const PostList = (props) => (
 ```js
 import React from 'react';
 import { fetchUtils, Admin, Resource } from 'react-admin';
-import simpleRestProvider from './ra-strapi-rest';
-import authProvider from './authProvider'
+import { strapiProviderStorage , authProvider, httpClient } from 'ra-strapi-rest';
+
 
 import { PostList } from './posts';
 
-const httpClient = (url, options = {}) => {
-    if (!options.headers) {
-        options.headers = new Headers({ Accept: 'application/json' });
-    }
-    const token = localStorage.getItem('token');
-    options.headers.set('Authorization', `Bearer ${token}`);
-    return fetchUtils.fetchJson(url, options);
-}
 
-const dataProvider = simpleRestProvider('http://localhost:1337', httpClient);
+
+const dataProvider = strapiProviderStorage('http://localhost:1337', httpClient);
 
 const App = () => (
     <Admin authProvider={authProvider} dataProvider={dataProvider}>
@@ -199,82 +201,3 @@ return ctx.badRequest(null, ctx.request.admin ? [{ messages: [{ id: 'Auth.form.e
 }
 ...
 ```
-
-# Example of a working authProvider.js
-```js
-// authProvider.js
-
-import { AUTH_LOGIN, AUTH_LOGOUT, AUTH_ERROR, AUTH_CHECK, AUTH_GET_PERMISSIONS } from 'react-admin';
-import Cookies from './helpers/Cookies';
-
-export default (type, params) => {
-    if (type === AUTH_LOGIN) {
-        const { username, password } = params;
-        const request = new Request('http://localhost:1337/auth/local', {
-            method: 'POST',
-            body: JSON.stringify({ username, password }),
-            headers: new Headers({ 'Content-Type': 'application/json'})
-        });
-        return fetch(request)
-            .then(response => {
-                if (response.status < 200 || response.status >= 300) {
-                    throw new Error(response.statusText);
-                }
-                return response.json();
-            })
-            .then(response => {
-                Cookies.setCookie('token', response.jwt, 1);
-                Cookies.setCookie('role', response.user.role.name, 1);
-            });
-    }
-
-    if (type === AUTH_LOGOUT) {
-        Cookies.deleteCookie('token');
-        Cookies.deleteCookie('role');
-        return Promise.resolve();
-    }
-
-    if (type === AUTH_ERROR) {
-        const status  = params.status;
-        if (status === 401 || status === 403) {
-            Cookies.deleteCookie('token');
-            Cookies.deleteCookie('role');
-            return Promise.reject();
-        }
-        return Promise.resolve();
-    }
-
-    if (type === AUTH_CHECK) {
-        return Cookies.getCookie('token') ? Promise.resolve() : Promise.reject();
-    }
-
-    if (type === AUTH_GET_PERMISSIONS) {
-        const role = Cookies.getCookie('role');
-        return role ? Promise.resolve(role) : Promise.reject();
-    }
-    return Promise.resolve();
-}
-
-// ====================
-// helpers/Cookies.js
-
-const Cookies = {
-	getCookie: (name) => {
-		const v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-    		return v ? v[2] : null;
-	},
-
-	setCookie: (name, value, days) => {
-		var d = new Date();
-    		d.setTime(d.getTime() + 24*60*60*1000*days);
-    		document.cookie = name + "=" + value + ";path=/;expires=" + d.toGMTString();
-	},
-
-	deleteCookie: (name) => {
-		Cookies.setCookie(name, '', -1)
-	}
-};
-
-export default Cookies;
-```
-Using cookies instead of localStorage because localStorage does not play well with private browsing

@@ -1,0 +1,12 @@
+{
+  "name": "ra-strapi-rest",
+  "version": "1.0.0",
+  "description": "rest for strapiJS",
+  "main": "index.js",
+  "repository": "https://github.com/devalexandre/ra-strapi-rest.git",
+  "author": "devalexandre <alexandre@indev.net.br>",
+  "license": "MIT",
+  "dependencies": {
+    "react-admin": "^3.3.1"
+  }
+}
