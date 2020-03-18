@@ -6,12 +6,12 @@
 yarn add  devalexandre/ra-strapi-rest 
 ```
 # Usage
-create .env for apiUrl file
+if use react-create-app create a .env file for strapi url
 
 ```
-apiUrl='/src/config.js'
-```
+REACT_APP_apiUrl='http://localhost:1337'
 
+```
 ```js
 import React from 'react';
 import { fetchUtils, Admin, Resource } from 'react-admin';
@@ -149,11 +149,7 @@ export const PostList = (props) => (
 import React from 'react';
 import { fetchUtils, Admin, Resource } from 'react-admin';
 import { ProviderStorage , authProvider, httpClient } from 'ra-strapi-rest';
-
-
 import { PostList } from './posts';
-
-
 
 const dataProvider = ProviderStorage('http://localhost:1337', httpClient);
 

@@ -1,7 +1,7 @@
 //import { apiUrl } from './config';
 import { AUTH_LOGIN, AUTH_LOGOUT, AUTH_ERROR, AUTH_CHECK, AUTH_GET_PERMISSIONS } from 'react-admin';
 
-const apiUrl = process.env.apiUrl || '/src/config.js';
+const apiUrl = process.env.REACT_APP_apiUrl || 'http://localhost:1337';
 
 const authProvider = (type, params) => {
    
