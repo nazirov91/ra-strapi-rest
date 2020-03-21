@@ -205,10 +205,10 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     return (type, resource, params) => {
         
         // Handle file uploading
-		const uploadFieldNames = determineUploadFieldNames(params);
-		if (uploadFieldNames.length > 0) {
-			return handleFileUpload(type, resource, params, uploadFieldNames);
-		}
+	const uploadFieldNames = determineUploadFieldNames(params);
+	if (uploadFieldNames.length > 0) {
+	    return handleFileUpload(type, resource, params, uploadFieldNames);
+	}
         
         // simple-rest doesn't handle filters on UPDATE route, so we fallback to calling UPDATE n times instead
         if (type === UPDATE_MANY) {
