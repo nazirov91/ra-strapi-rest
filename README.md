@@ -284,11 +284,11 @@ For example, say you have this `post` model
 ...
 ```
 
-And this Edit component for `posts` in React-Admin
+And this Create component for `posts` in React-Admin. (Edit component would be similar)
 
 ```js
-export const PostEdit = props => (
-   <Edit title="Article" {...props}>
+export const PostCreate = props => (
+   <Create title="Posts" {...props}>
       <SimpleForm>
          <TextInput source="title" />
 	 <TextInput source="body" />
@@ -308,7 +308,7 @@ export const PostEdit = props => (
              <FileField source="url" title="name" />
 	 </FileInput>
       </SimpleForm>
-   </Edit>
+   </Create>
 );
 ```
 Then there are 3 fields that require file upload feature - _images_, _files_, and _avatar_.
