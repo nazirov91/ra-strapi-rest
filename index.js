@@ -259,4 +259,4 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
             convertHTTPResponse(response, type, resource, params)
         );
     };
-};
+}; 
