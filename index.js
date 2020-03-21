@@ -105,6 +105,66 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 
         return sort + "&" + range + "&" + filter; 
     }
+    
+    // Determines if there are new files to upload
+    const determineUploadFieldNames = params => {
+		if (!params.data) return [];
+
+		// **********************************************
+		// Specify all available upload field names here
+		const allUploadFieldNames = [];
+		// **********************************************
+
+		// Check if the field names are mentioned in the allUploadFieldNames
+		// and verify there are new files being added
+		const requestUplaodFieldNames = [];
+		Object.keys(params.data).forEach(key => {
+			if (allUploadFieldNames.includes(key)) {
+				params.data[key] = !Array.isArray(params.data[key])
+					? [params.data[key]]
+					: params.data[key];
+				params.data[key].filter(f => f.rawFile instanceof File).length > 0 &&
+					requestUplaodFieldNames.push(key);
+			}
+		});
+
+		return requestUplaodFieldNames;
+	};
+    
+    // Handles file uploading for CREATE and UPDATE types
+	const handleFileUpload = (type, resource, params, uploadFields) => {
+		const { created_at, updated_at, createdAt, updatedAt, ...data } = params.data;
+		const id = type === UPDATE ? `/${params.id}` : "";
+		const url = `${apiUrl}/${resource}${id}`;
+		const requestMethod = type === UPDATE ? "PUT" : "POST";
+		const formData = new FormData();
+		const newFilesToAdd = [];
+
+		for (let fieldName of uploadFields) {
+			let fieldData = params.data[fieldName];
+			params.data[fieldName] = !Array.isArray(fieldData)
+				? [fieldData]
+				: fieldData;
+			let newFiles = fieldData.filter(f => f.rawFile instanceof File);
+			const currentFiles = fieldData.filter(f => !(f.rawFile instanceof File));
+
+			for (let newFile of newFiles) {
+				newFilesToAdd.push({
+					src: newFile.rawFile,
+					title: params.data.title
+				});
+				formData.append(`files.${fieldName}`, newFile.rawFile);
+			}
+
+			data[fieldName] = [...newFilesToAdd, ...currentFiles];
+		}
+		formData.append("data", JSON.stringify(data));
+
+		return httpClient(url, {
+			method: requestMethod,
+			body: formData
+		}).then(response => ({ data: response.json }));
+	};
 
     /**
      * @param {Object} response HTTP response from fetch()
@@ -143,6 +203,13 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
      * @returns {Promise} the Promise for a data response
      */
     return (type, resource, params) => {
+        
+        // Handle file uploading
+		const uploadFieldNames = determineUploadFieldNames(params);
+		if (uploadFieldNames.length > 0) {
+			return handleFileUpload(type, resource, params, uploadFieldNames);
+		}
+        
         // simple-rest doesn't handle filters on UPDATE route, so we fallback to calling UPDATE n times instead
         if (type === UPDATE_MANY) {
             return Promise.all(
