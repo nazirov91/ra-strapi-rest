@@ -254,3 +254,73 @@ const Cookies = {
 export default Cookies;
 ```
 Using cookies instead of localStorage because localStorage does not play well with private browsing
+
+# File Upload
+In order to use `ImageInput` or `FileInput` features of the React-Admin, you need to provide the names of the upload fields to the data provider.
+
+Steps
+1. Get the latest version of the index.js from the repo
+2. In `App.js` add a new array `uploadFields` and add the fields that are handling file upload for your resources. 
+
+For example, say you have this `post` model
+```json
+// <strapi_project>/api/post/models/post.settings.json
+...
+    "images": {
+      "collection": "file",
+      "via": "related",
+      "plugin": "upload"
+    },
+    "files": {
+      "collection": "file",
+      "via": "related",
+      "plugin": "upload"
+    },
+    "avatar": {
+      "model": "file",
+      "via": "related",
+      "plugin": "upload"
+    }
+...
+```
+
+And this Edit component for `posts` in React-Admin
+
+```js
+export const PostEdit = props => (
+   <Edit title="Article" {...props}>
+      <SimpleForm>
+         <TextInput source="title" />
+	 <TextInput source="body" />
+	 <BooleanInput source="published" />
+	 <ImageInput
+	     multiple={true}
+   	     source="images"
+	     label="Related pictures"
+	     accept="image/*"
+	 >
+	     <ImageField source="url" title="name" />
+	 </ImageInput>
+	 <ImageInput source="avatar" label="Avatar" accept="image/*">
+             <ImageField source="url" title="name" />
+	 </ImageInput>
+	 <FileInput source="files" label="Related files" multiple={true}>
+             <FileField source="url" title="name" />
+	 </FileInput>
+      </SimpleForm>
+   </Edit>
+);
+```
+Then there are 3 fields that require file upload feature - _images_, _files_, and _avatar_.
+
+So we need to pass those field names to the data provider.
+```js
+// App.js
+...
+const  uploadFields = ["images", "files", "avatar"];
+const  dataProvider = simpleRestProvider(baseUrl, httpClient, uploadFields);
+...
+```
+If the same name exists for multiple resources, **just mention it once**. Data provider will take care of the rest. 
+
+**NOTE**: Do not pass the resource names, only the field names inside the resources.
