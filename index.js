@@ -119,13 +119,13 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 	// and verify there are new files being added
 	const requestUplaodFieldNames = [];
 	Object.keys(params.data).forEach(key => {
-		if (allUploadFieldNames.includes(key)) {
-			params.data[key] = !Array.isArray(params.data[key])
-				? [params.data[key]]
-				: params.data[key];
-			params.data[key].filter(f => f.rawFile instanceof File).length > 0 &&
-				requestUplaodFieldNames.push(key);
-		}
+	   if (allUploadFieldNames.includes(key)) {
+		params.data[key] = !Array.isArray(params.data[key])
+		    ? [params.data[key]]
+		    : params.data[key];
+		params.data[key].filter(f => f.rawFile instanceof File).length > 0 &&
+		    requestUplaodFieldNames.push(key);
+	   }
 	});
 
 	return requestUplaodFieldNames;
@@ -141,28 +141,28 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 	const newFilesToAdd = [];
 
 	for (let fieldName of uploadFields) {
-		let fieldData = params.data[fieldName];
-		params.data[fieldName] = !Array.isArray(fieldData)
-			? [fieldData]
-			: fieldData;
-		let newFiles = fieldData.filter(f => f.rawFile instanceof File);
-		const currentFiles = fieldData.filter(f => !(f.rawFile instanceof File));
+	    let fieldData = params.data[fieldName];
+	    params.data[fieldName] = !Array.isArray(fieldData)
+	        ? [fieldData]
+	        : fieldData;
+	    let newFiles = fieldData.filter(f => f.rawFile instanceof File);
+	    const currentFiles = fieldData.filter(f => !(f.rawFile instanceof File));
 
-		for (let newFile of newFiles) {
-			newFilesToAdd.push({
-				src: newFile.rawFile,
-				title: params.data.title
-			});
-			formData.append(`files.${fieldName}`, newFile.rawFile);
-		}
+	    for (let newFile of newFiles) {
+	         newFilesToAdd.push({
+	       	    src: newFile.rawFile,
+		    title: params.data.title
+	         });
+		 formData.append(`files.${fieldName}`, newFile.rawFile);
+	    }
 
-		data[fieldName] = [...newFilesToAdd, ...currentFiles];
+	    data[fieldName] = [...newFilesToAdd, ...currentFiles];
 	}
 	formData.append("data", JSON.stringify(data));
 
 	return httpClient(url, {
-		method: requestMethod,
-		body: formData
+	    method: requestMethod,
+	    body: formData
 	}).then(response => ({ data: response.json }));
     };
 
