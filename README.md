@@ -141,6 +141,7 @@ import React from 'react';
 import { fetchUtils, Admin, Resource } from 'react-admin';
 import simpleRestProvider from './ra-strapi-rest';
 import authProvider from './authProvider'
+import Cookies from './helpers/Cookies';
 
 import { PostList } from './posts';
 
@@ -148,7 +149,7 @@ const httpClient = (url, options = {}) => {
     if (!options.headers) {
         options.headers = new Headers({ Accept: 'application/json' });
     }
-    const token = localStorage.getItem('token');
+    const token = Cookies.getCookie('token')
     options.headers.set('Authorization', `Bearer ${token}`);
     return fetchUtils.fetchJson(url, options);
 }
@@ -176,43 +177,20 @@ Strapi User-permission plugin expects you to send username and password in the f
 ```
 So in your front end form, the name for the username input should be **identifier**
 
-However, an easier fix is to modify the Auth.js file
-To do that, in your project folder, go to **plugins/user-permissions/controllers/Auth.js**
-Then add the following line:
-```js
-params.identifier = params.identifier ? params.identifier : params.username;
-```
-above this **if** statement
-```js
-if (!params.identifier) {
-    return ctx.badRequest(null, ctx.request.admin ? [{ messages: [{ id: 'Auth.form.error.email.provide' }] }] : 'Please provide your username or your e-mail.');
-}
-```
-
-So it should look like this:
-```js
-...
-// The identifier is required.
-params.identifier = params.identifier ? params.identifier : params.username;
-if (!params.identifier) {
-return ctx.badRequest(null, ctx.request.admin ? [{ messages: [{ id: 'Auth.form.error.email.provide' }] }] : 'Please provide your username or your e-mail.');
-}
-...
-```
-
 # Example of a working authProvider.js
+
 ```js
 // authProvider.js
 
-import { AUTH_LOGIN, AUTH_LOGOUT, AUTH_ERROR, AUTH_CHECK, AUTH_GET_PERMISSIONS } from 'react-admin';
-import Cookies from './helpers/Cookies';
+import Cookies from './helpers/Cookies'
 
-export default (type, params) => {
-    if (type === AUTH_LOGIN) {
-        const { username, password } = params;
+export default {
+
+    login: ({ username, password }) => {
+        const identifier = username // strapi expects 'identifier' and not 'username'
         const request = new Request('http://localhost:1337/auth/local', {
             method: 'POST',
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ identifier, password }),
             headers: new Headers({ 'Content-Type': 'application/json'})
         });
         return fetch(request)
@@ -226,33 +204,31 @@ export default (type, params) => {
                 Cookies.setCookie('token', response.jwt, 1);
                 Cookies.setCookie('role', response.user.role.name, 1);
             });
-    }
+    },
 
-    if (type === AUTH_LOGOUT) {
+    logout: () => {
         Cookies.deleteCookie('token');
         Cookies.deleteCookie('role');
         return Promise.resolve();
-    }
+    },
 
-    if (type === AUTH_ERROR) {
-        const status  = params.status;
+    checkAuth: () => {
+        return Cookies.getCookie('token') ? Promise.resolve() : Promise.reject();
+    },
+
+    checkError: ({ status }) => {
         if (status === 401 || status === 403) {
             Cookies.deleteCookie('token');
             Cookies.deleteCookie('role');
             return Promise.reject();
         }
         return Promise.resolve();
-    }
+    },
 
-    if (type === AUTH_CHECK) {
-        return Cookies.getCookie('token') ? Promise.resolve() : Promise.reject();
-    }
-
-    if (type === AUTH_GET_PERMISSIONS) {
+    getPermissions: () => {
         const role = Cookies.getCookie('role');
         return role ? Promise.resolve(role) : Promise.reject();
-    }
-    return Promise.resolve();
+    },
 }
 
 // ====================
