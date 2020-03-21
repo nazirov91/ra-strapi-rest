@@ -24,7 +24,7 @@ import {
  * CREATE       => POST http://my.api.url/posts
  * DELETE       => DELETE http://my.api.url/posts/123
  */
-export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
+export default (apiUrl, httpClient = fetchUtils.fetchJson, uploadFields = []) => {
     /**
      * @param {String} type One of the constants appearing at the top if this file, e.g. 'UPDATE'
      * @param {String} resource Name of the resource to fetch, e.g. 'posts'
@@ -110,16 +110,11 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
     const determineUploadFieldNames = params => {
 	if (!params.data) return [];
 
-	// **********************************************
-	// Specify all available upload field names here
-	const allUploadFieldNames = [];
-	// **********************************************
-
-	// Check if the field names are mentioned in the allUploadFieldNames
+	// Check if the field names are mentioned in the uploadFields
 	// and verify there are new files being added
 	const requestUplaodFieldNames = [];
 	Object.keys(params.data).forEach(key => {
-	   if (allUploadFieldNames.includes(key)) {
+	   if (uploadFields.includes(key)) {
 		params.data[key] = !Array.isArray(params.data[key])
 		    ? [params.data[key]]
 		    : params.data[key];
@@ -127,12 +122,13 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 		    requestUplaodFieldNames.push(key);
 	   }
 	});
-
+	
+	// Return an array of field names where new files are added
 	return requestUplaodFieldNames;
      };
     
     // Handles file uploading for CREATE and UPDATE types
-    const handleFileUpload = (type, resource, params, uploadFields) => {
+    const handleFileUpload = (type, resource, params, uploadFieldNames) => {
 	const { created_at, updated_at, createdAt, updatedAt, ...data } = params.data;
 	const id = type === UPDATE ? `/${params.id}` : "";
 	const url = `${apiUrl}/${resource}${id}`;
@@ -140,7 +136,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson) => {
 	const formData = new FormData();
 	const newFilesToAdd = [];
 
-	for (let fieldName of uploadFields) {
+	for (let fieldName of uploadFieldNames) {
 	    let fieldData = params.data[fieldName];
 	    params.data[fieldName] = !Array.isArray(fieldData)
 	        ? [fieldData]
