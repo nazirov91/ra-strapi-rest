@@ -113,13 +113,12 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson, uploadFields = []) =>
 	// Check if the field names are mentioned in the uploadFields
 	// and verify there are new files being added
 	const requestUplaodFieldNames = [];
-	Object.keys(params.data).forEach(key => {
-	   if (uploadFields.includes(key)) {
-		params.data[key] = !Array.isArray(params.data[key])
-		    ? [params.data[key]]
-		    : params.data[key];
-		params.data[key].filter(f => f.rawFile instanceof File).length > 0 &&
-		    requestUplaodFieldNames.push(key);
+	Object.keys(params.data).forEach(field => {
+	   let fieldData = params.data[field];
+	   if (uploadFields.includes(field)) {
+	      fieldData = !Array.isArray(fieldData) ? [fieldData] : fieldData;
+	      fieldData.filter(f => f.rawFile instanceof File).length > 0 
+		  && requestUplaodFieldNames.push(field);
 	   }
 	});
 	
