@@ -117,7 +117,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson, uploadFields = []) =>
 	   let fieldData = params.data[field];
 	   if (uploadFields.includes(field)) {
 	      fieldData = !Array.isArray(fieldData) ? [fieldData] : fieldData;
-	      fieldData.filter(f => f.rawFile instanceof File).length > 0 
+	      fieldData.filter(f => f && f.rawFile instanceof File).length > 0 
 		  && requestUplaodFieldNames.push(field);
 	   }
 	});
