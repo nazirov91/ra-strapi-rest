@@ -257,12 +257,6 @@ Using cookies instead of localStorage because localStorage does not play well wi
 
 # File Upload
 
-### NOTE
-Unfortunately, this feature is not working for MongoDB due to a bug in mongoose-connector. The following databases are working properly:
-- SQLite
-- MySQL
-- Postgres
-
 In order to use `ImageInput` or `FileInput` features of the React-Admin, you need to provide the names of the upload fields to the data provider.
 
 Steps
