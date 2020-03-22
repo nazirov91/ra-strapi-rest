@@ -324,3 +324,20 @@ const  dataProvider = simpleRestProvider(baseUrl, httpClient, uploadFields);
 If the same name exists for multiple resources, **just mention it once**. Data provider will take care of the rest. 
 
 **NOTE**: Do not pass the resource names, only the field names inside the resources.
+
+Example of Show component for image/file fields mentioned above
+
+```js
+export const PostShow = props => (
+    <Show {...props}>
+	<SimpleShowLayout>
+	    <TextField source="title" />
+	    <TextField source="body" />
+	    <BooleanField source="published" />
+	    <ImageField source="images" src="url"/>
+	    <ImageField source="avatar.url" label="Avatar" />
+	    <FileField source="files" src="url" title="name" target="_blank" />
+	</SimpleShowLayout>
+    </Show>
+);
+```
