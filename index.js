@@ -133,23 +133,19 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson, uploadFields = []) =>
 	const url = `${apiUrl}/${resource}${id}`;
 	const requestMethod = type === UPDATE ? "PUT" : "POST";
 	const formData = new FormData();
-	const newFilesToAdd = [];
 
 	for (let fieldName of uploadFieldNames) {
 	    let fieldData = params.data[fieldName];
 	    fieldData = !Array.isArray(fieldData) ? [fieldData] : fieldData;
-	    let newFiles = fieldData.filter(f => f.rawFile instanceof File);
-	    let existingFiles = fieldData.filter(f => !(f.rawFile instanceof File));
-
-	    for (let newFile of newFiles) {
-	        newFilesToAdd.push({
-	       	   src: newFile.rawFile,
-		   title: params.data.title
-	        });
-		formData.append(`files.${fieldName}`, newFile.rawFile);
+	    const existingFileIds = [];
+	    
+	    for (let item of fieldData) {
+		item.rawFile instanceof File
+		  ? formData.append(`files.${fieldName}`, item.rawFile)
+		  : existingFileIds.push(item.id || item._id);
 	    }
 
-	    data[fieldName] = [...newFilesToAdd, ...existingFiles];
+	    data[fieldName] = [...existingFileIds];
 	}
 	formData.append("data", JSON.stringify(data));
 
