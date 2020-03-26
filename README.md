@@ -5,6 +5,7 @@
 Save the **index.js** file as ra-strapi-rest.js and import it in your react-admin project. No need to npm install another dependency :)
 
 ```js
+// App.js
 import simpleRestProvider from './ra-strapi-rest';
 ```
 
