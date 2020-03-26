@@ -1,6 +1,6 @@
 {
   "name": "ra-strapi-rest",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A simple REST data provider to connect React-Admin and Strapi",
   "main": "index.js",
   "scripts": {
