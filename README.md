@@ -3,10 +3,23 @@
 
 # Usage
 Save the **index.js** file as ra-strapi-rest.js and import it in your react-admin project. No need to npm install another dependency :)
+
 ```js
-import React from 'react';
-import { fetchUtils, Admin, Resource } from 'react-admin';
 import simpleRestProvider from './ra-strapi-rest';
+```
+
+If you prefer to add this to node modules, go ahead and run the following command
+```
+npm install ra-strapi-rest
+```
+or
+```
+yarn add ra-strapi-rest
+```
+
+Then import it in your `App.js` as usual
+```js
+import simpleRestProvider from 'ra-strapi-rest';
 ```
 
 # IMPORTANT! Strapi Content-Range Header Setup

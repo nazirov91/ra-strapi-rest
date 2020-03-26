@@ -1,0 +1,26 @@
+{
+  "name": "ra-strapi-rest",
+  "version": "0.1.0",
+  "description": "A simple REST data provider to connect React-Admin and Strapi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nazirov91/ra-strapi-rest.git"
+  },
+  "keywords": [
+    "strapi",
+    "react-admin",
+    "react",
+    "admin-on-rest",
+    "rest"
+  ],
+  "author": "Sardor (sardor.io)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nazirov91/ra-strapi-rest/issues"
+  },
+  "homepage": "https://github.com/nazirov91/ra-strapi-rest#readme"
+}
