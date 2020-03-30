@@ -13,9 +13,6 @@ import {
 
 /**
  * Maps react-admin queries to a simple REST API
- *
- * The REST dialect is similar to the one of FakeRest
- * @see https://github.com/marmelab/FakeRest
  * @example
  * GET_LIST     => GET http://my.api.url/posts?sort=['title','ASC']&range=[0, 24]
  * GET_ONE      => GET http://my.api.url/posts/123
@@ -152,8 +149,23 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson, uploadFields = []) =>
 	return httpClient(url, {
 	    method: requestMethod,
 	    body: formData
-	}).then(response => ({ data: response.json }));
+	}).then(response => ({ data: replaceRefObjectsWithIds(response.json) }));
     };
+    
+    // Replace reference objects with reference object IDs	
+    const replaceRefObjectsWithIds = json => {
+    	Object.keys(json).forEach(key => {
+	    const fd = json[key]; // field data
+	    const referenceKeys = [];
+	    if (fd && (fd.id || fd._id) && !fd.mime) {
+	        json[key] = fd.id || fd._id;
+	    } else if (Array.isArray(fd) && fd.length > 0 && !fd[0].mime) {
+	        fd.map(item => referenceKeys.push(item.id || item._id));
+	        json[key] = referenceKeys;
+	    }
+	});
+	return json;
+    }
 
     /**
      * @param {Object} response HTTP response from fetch()
@@ -165,6 +177,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson, uploadFields = []) =>
     const convertHTTPResponse = (response, type, resource, params) => {
         const { headers, json } = response;
         switch (type) {
+	    case GET_ONE:
+	        return { data: replaceRefObjectsWithIds(json) };
             case GET_LIST:
             case GET_MANY_REFERENCE:
                 if (!headers.has('content-range')) {
@@ -229,8 +243,8 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson, uploadFields = []) =>
         //strapi doesn't handle filters in GET route
         if (type === GET_MANY) {
             return Promise.all(
-                params.ids.map(id =>
-                    httpClient(`${apiUrl}/${resource}/${id}`, {
+                params.ids.map(i =>
+                    httpClient(`${apiUrl}/${resource}/${i.id || i._id || i}`, {
                         method: 'GET',
                     })
                 )
