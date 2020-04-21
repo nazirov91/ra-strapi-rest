@@ -175,20 +175,15 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson, uploadFields = []) =>
      * @returns {Object} Data response
      */
     const convertHTTPResponse = (response, type, resource, params) => {
-        const { headers, json } = response;
+        const { headers, json, total } = response;
         switch (type) {
 	    case GET_ONE:
 	        return { data: replaceRefObjectsWithIds(json) };
             case GET_LIST:
             case GET_MANY_REFERENCE:
-                if (!headers.has('content-range')) {
-                    throw new Error(
-                        'The Content-Range header is missing in the HTTP Response. The simple REST data provider expects responses for lists of resources to contain this header with the total number of results to build the pagination. If you are using CORS, did you declare Content-Range in the Access-Control-Expose-Headers header?'
-                    );
-                }
                 return {
                     data: json,
-                    total: parseInt(headers.get('content-range').split('/').pop(), 10)
+                    total
                 };
             case CREATE:
                 return { data: { ...params.data, id: json.id } };
@@ -258,8 +253,29 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson, uploadFields = []) =>
             resource,
             params
         );
-        return httpClient(url, options).then(response =>
-            convertHTTPResponse(response, type, resource, params)
-        );
+
+        // Get total via model/count endpoint
+        if (type === GET_MANY_REFERENCE || type === GET_LIST) {
+            const { url: urlForCount } = convertDataRequestToHTTP(
+                type,
+                resource + "/count",
+                params
+            );
+            return Promise.all([
+                httpClient(url, options),
+                httpClient(urlForCount, options),
+            ]).then(promises => {
+                const response = {
+                    ...promises[0],
+                    // Add total for further use
+                    total: parseInt(promises[1].json, 10),
+                };
+                return convertHTTPResponse(response, type, resource, params);
+            });
+        } else {
+            return httpClient(url, options).then((response) =>
+                convertHTTPResponse(response, type, resource, params)
+            );
+        }
     };
 }; 

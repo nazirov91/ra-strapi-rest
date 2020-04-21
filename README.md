@@ -23,9 +23,8 @@ Then import it in your `App.js` as usual
 import simpleRestProvider from 'ra-strapi-rest';
 ```
 
-# IMPORTANT! Strapi Content-Range Header Setup
+# IMPORTANT!
 1. Make sure CORS is enabled in Strapi project
-2. Add Content-Range to expose headers object
 *<your_project>/config/environments/development/security.js*
 ```
 {
@@ -33,84 +32,12 @@ import simpleRestProvider from 'ra-strapi-rest';
 "cors": {
     "enabled": true,
     "origin": "*",
-    "expose": [
-      "WWW-Authenticate",
-      "Server-Authorization",
-      "Content-Range" // <<--- HERE
-    ],
     ...
   },
   ...
 }
 ```
-3. In controllers, you need to set the `Content-Range` header with the total number of results to build the pagination
-```js
-...
-find: async (ctx) => {
-  ctx.set('Content-Range', await strapi.services.<Model_Name>.count());
-  if (ctx.query._q) {
-    return strapi.services.<Model_Name>.search(ctx.query);
-  } else {
-    return strapi.services.<Model_Name>.find(ctx.query);
-  }
-},
-...
-```
-Example:
-```js
-...
-find: async (ctx) => {
-  ctx.set('Content-Range', await strapi.services.Post.count());
-  if (ctx.query._q) {
-    return strapi.services.post.search(ctx.query);
-  } else {
-    return strapi.services.post.find(ctx.query);
-  }
-},
-...
-```
-
-# Strapi Beta - Controllers
-In the Beta version of Strapi, controllers are abstracted away, and the files are empty. How do we add the **Content-Range** header now??
-The solution is simple: just extend the **find** method of each controller.
-
-Say you have a Strapi API `/post` and corresponding `Post.js` controller file. But the file is empty
-```js
-// api/post/controllers/Post.js
-'use strict'
-
-module.exports = {};
-```
-
-According to the [Strapi Documentation](https://strapi.io/documentation/3.0.0-beta.x/concepts/controllers.html#core-controllers), when you create a new Content or model, Strapi builds a generic controller for your models by default and allows you to override and extend it in the generated file. 
-
-So to make the React-Admin work, we have to extend the find method of the `post` controller. 
-
-```js
-// api/post/controllers/Post.js
-
-'use strict';
-const { sanitizeEntity } = require('strapi-utils');
-
-module.exports = {
-  async find(ctx) {
-    let entities;
-    ctx.set('Content-Range', await strapi.services.post.count()); // <--- Add this guy
-    if (ctx.query._q) {
-      entities = await strapi.services.post.search(ctx.query);
-    } else {
-      entities = await strapi.services.post.find(ctx.query);
-    }
-
-    return entities.map(entity =>
-      sanitizeEntity(entity, { model: strapi.models.post })
-    );
-  },
-};
-```
-Note that my model name is called `post` here. Replace it with whatever content you are dealing with.
-
-The content-range header is required only for the `find` method
+2. Check your user permissions. Find and count is required for listing entries
 
 # Example
 
