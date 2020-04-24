@@ -178,7 +178,7 @@ export default (apiUrl, httpClient = fetchUtils.fetchJson, uploadFields = []) =>
         const { headers, json, total } = response;
         switch (type) {
 	    case GET_ONE:
-	        return { data: replaceRefObjectsWithIds(json) };
+	        return { data: json };
             case GET_LIST:
             case GET_MANY_REFERENCE:
                 return {
