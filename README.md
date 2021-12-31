@@ -172,7 +172,7 @@ export default {
     },
 }
 
-// ====================
+// =======================
 // helpers/Cookies.js
 
 const Cookies = {
