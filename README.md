@@ -12,6 +12,15 @@ Also, it is converted to TypeScript.
 
 ### Checkout this demo for reference => [Demo](https://github.com/nazirov91/ra-strapi-rest-demo)
 
+- [x] Works with Single Types
+- [x] Works with Collection types
+- [x] Works with Components
+- [x] Handles single and multiple Media files
+- [x] Handles basic filtering
+- [x] Handles sorting and pagination
+- [x] Works with reference fields/inputs under community version
+- [x] Tested with Sqlite and Postgres
+
 # Usage
 
 Save the **index.ts** file as `ra-strapi-rest.ts` and import it in your react-admin project. No need to npm install another dependency :)
