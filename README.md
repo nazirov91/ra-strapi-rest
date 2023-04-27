@@ -50,27 +50,22 @@ yarn add ra-strapi-rest
 Then import it in your `App.tsx` as usual
 
 ```tsx
-import simpleRestProvider from "ra-strapi-rest";
+import raStrapiRest from "ra-strapi-rest";
 ```
 
 # Example
 
 ```tsx
 import { fetchUtils, Admin, Resource } from "react-admin";
-
 import { ArticleList } from "./pages/articles/articleList";
-
-import raStrapiRest from "./ra-strapi-rest";
-
 import { AppLayout } from "./Layout";
+import raStrapiRest from "./ra-strapi-rest";
 
 const strapiApiUrl = "http://localhost:1337/api";
 
 const httpClient = (url: string, options: any = {}) => {
   options.headers = options.headers || new Headers({ Accept: "application/json" });
-
   options.headers.set("Authorization", `Bearer ${import.meta.env.VITE_STRAPI_API_TOKEN}`);
-
   return fetchUtils.fetchJson(url, options);
 };
 
@@ -94,8 +89,6 @@ export default App;
 ArticleList Component:
 
 ```tsx
-import React from "react";
-
 import { List, Datagrid, TextField } from "react-admin";
 
 export const ArticleList = () => (
