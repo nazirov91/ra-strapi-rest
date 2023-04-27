@@ -73,13 +73,7 @@ export const dataProvider = raStrapiRest(strapiApiUrl, httpClient);
 
 const App = () => (
   <Admin layout={AppLayout} dataProvider={dataProvider}>
-    <Resource
-      name="articles"
-      list={ArticleList}
-      show={ArticleShow}
-      edit={ArticleEdit}
-      create={ArticleCreate}
-    />
+    <Resource name="articles" list={ArticleList} />
   </Admin>
 );
 
@@ -95,7 +89,6 @@ export const ArticleList = () => (
   <List hasCreate hasEdit filters={articleFilters}>
     <Datagrid rowClick="show">
       <TextField source="title" />
-
       <TextField source="published_date" label="Publish date" />
     </Datagrid>
   </List>
