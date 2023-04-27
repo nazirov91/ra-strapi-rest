@@ -21,6 +21,8 @@ Also, it is converted to TypeScript.
 - [x] Works with reference fields/inputs under community version
 - [x] Tested with Sqlite and Postgres
 
+Please submit a PR with an example if you find any bugs. Thanks!
+
 # Usage
 
 Save the **index.ts** file as `ra-strapi-rest.ts` and import it in your react-admin project. No need to npm install another dependency :)
