@@ -10,7 +10,7 @@ If you want to use the version compatible with Strapi V3 check the following [re
 
 Also, it is converted to TypeScript.
 
-### Checkout this demo for reference => [Demo](https://github.com/nazirov91/ra-strapi-rest-demo)
+### Check out this demo for reference => [Demo](https://github.com/nazirov91/ra-strapi-rest-demo)
 
 - [x] Works with Single Types
 - [x] Works with Collection types
@@ -34,17 +34,13 @@ import raStrapiRest from "./ra-strapi-rest";
 If you prefer to add this to node modules, go ahead and run the following command
 
 ```
-
 npm install ra-strapi-rest
-
 ```
 
 or
 
 ```
-
 yarn add ra-strapi-rest
-
 ```
 
 Then import it in your `App.tsx` as usual
@@ -95,4 +91,4 @@ export const ArticleList = () => (
 );
 ```
 
-### Checkout this demo for detailed reference => [Demo](https://github.com/nazirov91/ra-strapi-rest-demo)
+### Check out this demo for detailed reference => [Demo](https://github.com/nazirov91/ra-strapi-rest-demo)
