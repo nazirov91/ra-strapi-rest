@@ -56,7 +56,6 @@ import raStrapiRest from "ra-strapi-rest";
 ```tsx
 import { fetchUtils, Admin, Resource } from "react-admin";
 import { ArticleList } from "./pages/articles/articleList";
-import { AppLayout } from "./Layout";
 import raStrapiRest from "./ra-strapi-rest";
 
 const strapiApiUrl = "http://localhost:1337/api";
@@ -70,7 +69,7 @@ const httpClient = (url: string, options: any = {}) => {
 export const dataProvider = raStrapiRest(strapiApiUrl, httpClient);
 
 const App = () => (
-  <Admin layout={AppLayout} dataProvider={dataProvider}>
+  <Admin dataProvider={dataProvider}>
     <Resource name="articles" list={ArticleList} />
   </Admin>
 );
