@@ -4,9 +4,9 @@
 
 # Strapi V4 Update
 
-### RA-STRAPI-REST works with Strapi V4 now. 🚀
+### RA-STRAPI-REST works with Strapi V4. 🚀
 
-If you want to use the version compatible with Strapi V3 check the following [release code](https://github.com/nazirov91/ra-strapi-rest/releases/tag/0.1.2).
+If you want to use the version compatible with Strapi V3 check [this PR](https://github.com/nazirov91/ra-strapi-rest/blob/86c6964a352aeb8aac86ba1b6b95b1801dc3e782/index.js).
 
 Also, it is converted to TypeScript.
 
